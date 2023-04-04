@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from epoch_post.epoch3d.utils import DotDict, VECTOR_TO_NAME, VECTOR_TO_UNITS, UNIT_TRANSFORM
+from epoch_post.epoch3d.utils import DotDict, VECTOR_TO_NAME, VECTOR_TO_UNITS, UNIT_TRANSFORM, UNIT_SHORT
 
 # ----------------------------- #
 
@@ -11,7 +11,7 @@ COLORMAPS = {
     'Electric_Field' : DEFAULT_DIVERGING,
     'Current_Density' : DEFAULT_DIVERGING,
     'Magnetic_Field' : DEFAULT_DIVERGING,
-    'Number_Density' : 'hot',
+    'Number_Density_Abs' : 'hot',
     'Electric_Field_Abs' : DEFAULT_ABS,
     'Magnetic_Field_Abs' : DEFAULT_ABS,
     'Current_Density_Abs' : DEFAULT_ABS
@@ -26,6 +26,12 @@ def imshow_setup(data: DotDict, slice_: str, value: str, name: str, forceabs: bo
     vol = data[value][slice_]
     extent_key = slice_.split('_')[0]
     extent = []
+    axes = ['x', 'y', 'z']
+    axes.pop(axes.index(extent_key))
+    labels = [
+        r'$' + x + r'$, ' + UNIT_SHORT[data.config.volume_slices.unit] 
+        for x in axes
+    ][::-1]
 
     for k, v in data.grid_minmax.items():
         if k == extent_key:
@@ -47,11 +53,11 @@ def imshow_setup(data: DotDict, slice_: str, value: str, name: str, forceabs: bo
         vmin, vmax = -mx, mx
         cmap = COLORMAPS.get(name, DEFAULT_DIVERGING)
     
-    return vol, extent, vmin, vmax, cmap
+    return vol, extent, vmin, vmax, cmap, labels
 
 # ----------------------------- #
 
-def plot_vector_component(
+def plot_scalar_field(
         
         data: DotDict, 
         slice_: str, 
@@ -63,7 +69,7 @@ def plot_vector_component(
     ):
 
     name = VECTOR_TO_NAME[vector]
-    vol, extent, vmin, vmax, cmap = imshow_setup(
+    vol, extent, vmin, vmax, cmap, labels = imshow_setup(
                                     data, 
                                     slice_, 
                                     f'{name}_{vector}{component}',
@@ -81,20 +87,41 @@ def plot_vector_component(
                 vmin=vmin * scaler,
                 vmax=vmax * scaler
             )
+
     
-    cbar = plt.colorbar(im, ax=ax)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.1)
     cbar.set_label(
         r'$' + f'{vector}_{component}' + r'$, ' + \
         VECTOR_TO_UNITS.get(vector, r'$\rm{c.u.}$'), 
         labelpad=15)
 
+    ax.set_xlabel(labels[0], labelpad=15)
+    ax.set_ylabel(labels[1], labelpad=15)
+
     return fig, ax
 
 # ----------------------------- #
 
-def plot_efield(data: DotDict, slice_: str, component: str = 'x', forceabs: bool = False):
+def plot_density(data: DotDict, slice_: str):
+    pass
+
+# ----------------------------- #
+
+def plot_temperature(data: DotDict, slice_: str):
+    pass
+
+# ----------------------------- #
+
+def plot_efield(
+        
+        data: DotDict, 
+        slice_: str, 
+        component: str = 'x', 
+        forceabs: bool = False
+
+    ):
     
-    fig, ax = plot_vector_component(
+    fig, ax = plot_scalar_field(
         data, 
         slice_, 
         vector='E',
@@ -106,24 +133,39 @@ def plot_efield(data: DotDict, slice_: str, component: str = 'x', forceabs: bool
 
 # ----------------------------- #
 
-def plot_bfield(data: DotDict, slice_: str, component: str = 'x', forceabs: bool = False):
+def plot_bfield(
+        
+        data: DotDict, 
+        slice_: str, 
+        component: str = 'x', 
+        forceabs: bool = False
     
-    fig, ax = plot_vector_component(
+    ):
+    
+    fig, ax = plot_scalar_field(
         data, 
         slice_, 
         vector='B',
         component=component,
         forceabs=forceabs,
-        scaler=1e-5
+        scaler=1e-5 # force GGs: 
+                    # 1e4 (from Ts to Gs) * 1e-9 (from Gs to GGs)
     )
 
     return fig, ax
 
 # ----------------------------- #
 
-def plot_jfield(data: DotDict, slice_: str, component: str = 'x', forceabs: bool = False):
+def plot_jfield(
+        
+        data: DotDict, 
+        slice_: str, 
+        component: str = 'x', 
+        forceabs: bool = False
     
-    fig, ax = plot_vector_component(
+    ):
+    
+    fig, ax = plot_scalar_field(
         data, 
         slice_, 
         vector='J',

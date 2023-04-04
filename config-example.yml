@@ -1,0 +1,27 @@
+species: # names from an input file
+  - electron
+  - gold
+  
+extract:
+  - Electric_Field_Ex
+  - Current_Jx
+  - Magnetic_Field_Bx
+  - Derived_Charge_Density
+
+particle_extract:
+  - Derived_Number_Density
+  - Particles_Py
+  - Particles_Pz
+
+volume_slices:
+  x: # yz plane
+    start: -0.5
+    stop: 0.5
+    nstep: 10
+
+  z: # xy plane
+    start: -0.5
+    stop: 0.5
+    nstep: 10
+
+  unit: micro

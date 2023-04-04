@@ -18,6 +18,11 @@ UNIT_TRANSFORM = {
     'peta' : 1e15
 }
 
+UNIT_SHORT = {
+    'nano' : r'$\rm{nm}$',
+    'micro' : r'$\rm{\mu m}$'
+}
+
 VECTOR_TO_NAME = {
     'E' : 'Electric_Field',
     'B' : 'Magnetic_Field',
