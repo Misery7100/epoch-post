@@ -27,7 +27,8 @@ class Builder:
     DEFAULT_PARTICLE_EXTRACT = [
         'Derived_Number_Density',
         'Derived_Temperature',
-        'Derived_Average_Particle_Energy'
+        'Derived_Average_Particle_Energy',
+        'Grid_Particles'
     ]
 
     FLAT_ATTRS = [
@@ -38,7 +39,7 @@ class Builder:
         'Grid_Grid'
     ]
 
-    DEFAULT_CONFIG_PATH = 'output-config.yml'
+    DEFAULT_CONFIG_PATH = './epoch_post/config-example.yml'
     UNIT_TRANSFORM = UNIT_TRANSFORM
 
     # ............................. #
