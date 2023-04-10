@@ -153,7 +153,6 @@ class OptimizedBuilder(Builder):
                 new_output[k] = self._optimize_grid(v)
 
             elif k not in OptimizedBuilder.NO_VOLUME_ATTRS:
-                print(k, '...')
                 new_output[k] = self._optimize_volumes(v, data.config['volume_slices'], grid_minmax)
 
             else:

@@ -1,4 +1,5 @@
 import yaml
+import json
 
 # ----------------------------- #
 
@@ -18,6 +19,7 @@ UNIT_TRANSFORM = {
     'peta' : 1e15
 }
 
+# metres (?)
 UNIT_SHORT = {
     'nano' : r'$\rm{nm}$',
     'micro' : r'$\rm{\mu m}$'
@@ -31,7 +33,8 @@ VECTOR_TO_NAME = {
 
 VECTOR_TO_UNITS = {
     'E' : r'$V\:/\:m$',
-    'B' : r'$GGs$'
+    'B' : r'$GGs$',
+    'J' : r'$A\:/\:m^{2}$'
 }
 
 # ----------------------------- #
@@ -58,3 +61,19 @@ def read_yaml(path: str) -> DotDict:
     f = DotDict(f)
 
     return f
+
+# ----------------------------- #
+
+def write_json(f: object, path: str) -> None:
+    with open(path, 'w') as file:
+        json.dump(f, file)
+
+# ----------------------------- #
+
+def read_json(path: str) -> dict:
+    with open(path, 'r') as file:
+        data = json.load(file)
+    
+    return data
+
+# ----------------------------- #

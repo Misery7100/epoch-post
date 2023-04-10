@@ -20,8 +20,8 @@ COLORMAPS = {
 # ----------------------------- #
 
 def imshow_setup(data: DotDict, slice_: str, value: str, name: str, forceabs: bool):
-    assert value in data.keys()
-    assert slice_ in data[value].keys()
+    assert value in data.keys(), f'{value} not in data keys'
+    assert slice_ in data[value].keys(), f'{slice_} not in data.{value} keys'
 
     vol = data[value][slice_]
     extent_key = slice_.split('_')[0]
@@ -64,7 +64,8 @@ def plot_scalar_field(
         vector: str = 'E',
         component: str = 'x', 
         forceabs: bool = False,
-        scaler: float = 1.0
+        scaler: float = 1.0,
+        for_export: bool = False
 
     ):
 
@@ -77,7 +78,16 @@ def plot_scalar_field(
                                     forceabs
                                 )
     
-    fig, ax = plt.subplots(figsize=(10, 10))
+    metadata = {
+        'vmin' : vmin,
+        'vmax' : vmax,
+        'scaler' : scaler,
+    }
+    
+    fig, ax = plt.subplots(
+                    figsize=(10, 10), 
+                    frameon=not for_export
+                )
 
     im = ax.imshow(
                 vol * scaler,
@@ -88,17 +98,20 @@ def plot_scalar_field(
                 vmax=vmax * scaler
             )
 
-    
-    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.1)
-    cbar.set_label(
-        r'$' + f'{vector}_{component}' + r'$, ' + \
-        VECTOR_TO_UNITS.get(vector, r'$\rm{c.u.}$'), 
-        labelpad=15)
+    if for_export:
+        plt.axis('off')
 
-    ax.set_xlabel(labels[0], labelpad=15)
-    ax.set_ylabel(labels[1], labelpad=15)
+    else:
+        cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.1)
+        cbar.set_label(
+            r'$' + f'{vector}_{component}' + r'$, ' + \
+            VECTOR_TO_UNITS.get(vector, r'$\rm{c.u.}$'), 
+            labelpad=15)
 
-    return fig, ax
+        ax.set_xlabel(labels[0], labelpad=15)
+        ax.set_ylabel(labels[1], labelpad=15)
+
+    return fig, ax, metadata
 
 # ----------------------------- #
 
@@ -117,19 +130,21 @@ def plot_efield(
         data: DotDict, 
         slice_: str, 
         component: str = 'x', 
-        forceabs: bool = False
+        forceabs: bool = False,
+        **kwargs
 
     ):
     
-    fig, ax = plot_scalar_field(
+    fig, ax, metadata = plot_scalar_field(
         data, 
         slice_, 
         vector='E',
         component=component,
-        forceabs=forceabs
+        forceabs=forceabs,
+        **kwargs
     )
 
-    return fig, ax
+    return fig, ax, metadata
 
 # ----------------------------- #
 
@@ -138,21 +153,23 @@ def plot_bfield(
         data: DotDict, 
         slice_: str, 
         component: str = 'x', 
-        forceabs: bool = False
+        forceabs: bool = False,
+        **kwargs
     
     ):
     
-    fig, ax = plot_scalar_field(
+    fig, ax, metadata = plot_scalar_field(
         data, 
         slice_, 
         vector='B',
         component=component,
         forceabs=forceabs,
-        scaler=1e-5 # force GGs: 
+        scaler=1e-5, # force GGs: 
                     # 1e4 (from Ts to Gs) * 1e-9 (from Gs to GGs)
+        **kwargs
     )
 
-    return fig, ax
+    return fig, ax, metadata
 
 # ----------------------------- #
 
@@ -161,16 +178,18 @@ def plot_jfield(
         data: DotDict, 
         slice_: str, 
         component: str = 'x', 
-        forceabs: bool = False
+        forceabs: bool = False,
+        **kwargs
     
     ):
     
-    fig, ax = plot_scalar_field(
+    fig, ax, metadata = plot_scalar_field(
         data, 
         slice_, 
         vector='J',
         component=component,
-        forceabs=forceabs
+        forceabs=forceabs,
+        **kwargs
     )
 
-    return fig, ax
+    return fig, ax, metadata
